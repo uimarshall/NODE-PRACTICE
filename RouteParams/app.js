@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 
+// Route Parameters is just like a variable in the route holding something
 app.get("/says/:animal", (req, res)=>{
 	console.log(req.params);
 	let animal = req.params.animal.toLowerCase();
