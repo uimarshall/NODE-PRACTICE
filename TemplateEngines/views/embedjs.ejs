@@ -1,1 +1,13 @@
-<h2><%= dataTobeEmbed %> Is the <strong>G. O. A. T</strong></h2>
+<% include partials/header %>
+<h2>
+    <%= dataTobeEmbed %> Is the <strong>G. O. A. T</strong></h2>
+
+<% if(dataTobeEmbed.toLowerCase() === 'messi'){ %>
+<h2>
+    <%= dataTobeEmbed %> Is equally the <strong>G. O. A. T</strong></h2>
+
+<% } else { %>
+<h3>You should have said Ronaldo or Messi</h3>
+
+<% } %>
+<% include partials/footer %>
