@@ -1,8 +1,11 @@
 var express = require("express");
+var bodyParser = require("body-parser");
 var app = express();
 
 app.use(express.static("public"));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
+friends = ["Fred", "Drago", "Loveth", "Eunice"];
 
 app.get("/", (req, res) => {
 	res.render("home", { title: "" });
@@ -28,6 +31,17 @@ app.get("/posts", (req, res) => {
 app.get("/players/:name", (req, res) => {
 	let routeVar = req.params.name;
 	res.render("embedjs", { dataTobeEmbed: routeVar, title: "players" });
+});
+
+app.get("/friends", (req, res) => {
+	res.render("postRequest", { friends: friends, title: "" });
+});
+
+app.post("/addfriends", (req, res) => {
+	// console.log(req.body);
+	let friend = req.body.newfriend;
+	friends.push(friend);
+	res.redirect("/friends");
 });
 
 const PORT = process.env.PORT || 3000;
