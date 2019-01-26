@@ -27,7 +27,11 @@ router.get("/blogs/new", (req, res) => {
 
 // CREATE ROUTE - Create a particular post and redirect
 router.post("/blogs", (req, res) => {
-	// console.log(req.body.blog);
+	// sanitize when u create to bar users frm typing scripts into the app
+	console.log(req.body);
+	req.body.blog.body = req.sanitize(req.body.blog.body);
+	console.log("====================");
+	console.log(req.body);
 	Blog.create(req.body.blog, (err, newBlog) => {
 		if (err) {
 			console.log(err);
@@ -66,6 +70,8 @@ router.get("/blogs/:id/edit", (req, res) => {
 // UPDATE ROUTE
 // We use PUT mtd bc we are putting to/changing what is already there using a particular id
 router.put("/blogs/:id", (req, res) => {
+	// Sanitize when u update, so that users will not enter script and break the code
+	req.body.blog.body = req.sanitize(req.body.blog.body);
 	//It takes the form "Blog.findByIdAndUpdate(idTofindBy, newDataFromForm, callback)""
 	// The 'blog' houses the title,image,body,id as specified in the schema,when we type into d edit form
 	Blog.findByIdAndUpdate(req.params.id, req.body.blog, (err, updatedBlog) => {

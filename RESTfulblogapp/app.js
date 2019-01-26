@@ -2,15 +2,15 @@
 // REST -is an Architecture, pattern of mapping btw HTTP routes & CRUD
 
 // A table of all 7 RESTful Routes
-/*  Name        Path             HTTP Verb               Purpose
-========================================================================================================
-INDEX           /dogs             GET                   List all dogs
-NEW             /dogs/new         GET                   Show new dog form
-CREATE          /dogs             POST                  Create a new dog then redirect somewhere
-SHOW            /dogs/:id         GET                   Show info about one specific dog
-EDIT            /dogs/:id/edit    GET                   Show edit form for one dog
-UPDATE          /dogs/:id         PUT                   Update a particular dog then redirect somewhere
-DESTROY          /dogs/:id         DELETE               Delete a particular dog then redirect somewhere
+/*  Name        Path             HTTP Verb               Purpose 										Mongoose Mtd
+=====================================================================================================================
+INDEX           /dogs             GET                   List all dogs 									Dogs.find()
+NEW             /dogs/new         GET                   Show new dog form 								N/A
+CREATE          /dogs             POST                  Create a new dog then redirect somewhere        Dogs.create()
+SHOW            /dogs/:id         GET                   Show info about one specific dog                Dogs.findById
+EDIT            /dogs/:id/edit    GET                   Show edit form for one dog                      Dogs.findById
+UPDATE          /dogs/:id         PUT                   Update a particular dog then redirect somewhere Dogs.findByIdAndUpdate
+DESTROY          /dogs/:id         DELETE               Delete a particular dog then redirect somewhere Dogs.findByIdAndRemove
 */
 /*App = blogApp
 Our blog will have the ffg:
@@ -23,6 +23,7 @@ const bodyParser = require("body-parser");
 // const mongoose = require("mongoose");
 const express = require("express");
 const methodOverride = require("method-override");
+const expressSanitizer = require("express-sanitizer");
 const routes = require("./routes/controllers.js");
 const app = express();
 // Connect Db
@@ -39,6 +40,8 @@ app.use(express.static("public"));
 
 // Parse entries to the form used
 app.use(bodyParser.urlencoded({ extended: true }));
+// Sanitizer comes after bodyParser,after being parsed and attached to the 'req' obj
+app.use(expressSanitizer());
 app.use(methodOverride("_method"));
 
 // MIDDLEWARE ROUTE HANDLER: RESTFUL ROUTES
