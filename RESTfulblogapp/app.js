@@ -22,6 +22,7 @@ Our blog will have the ffg:
 const bodyParser = require("body-parser");
 // const mongoose = require("mongoose");
 const express = require("express");
+const methodOverride = require("method-override");
 const routes = require("./routes/controllers.js");
 const app = express();
 // Connect Db
@@ -38,6 +39,7 @@ app.use(express.static("public"));
 
 // Parse entries to the form used
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(methodOverride("_method"));
 
 // MIDDLEWARE ROUTE HANDLER: RESTFUL ROUTES
 // This will enable the app know which request handler to handover the req to

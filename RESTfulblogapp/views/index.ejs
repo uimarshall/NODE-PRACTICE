@@ -1,3 +1,4 @@
+<% include partials/header %>
 <h1>This is the index page!</h1>
 <%blogs.forEach(blog => {%>
 <!-- <% console.log(blog) %> -->
@@ -6,11 +7,14 @@
         <%= blog.title %>
     </h2>
     <img src="<%= blog.image %>">
-
-    <p>
-        <%= blog.body %>
-    </p>
     <span>
         <%= blog.created %></span>
+
+    <p>
+        <%= blog.body.substring(0, 100) %>
+        ...</p>
+
+    <a href="/blogs/<%=blog._id%>">Read More</a>
 </div>
 <%})%>
+<% include partials/footer %>
