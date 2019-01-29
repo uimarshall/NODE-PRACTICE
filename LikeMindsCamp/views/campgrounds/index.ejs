@@ -1,0 +1,43 @@
+<% include ../partials/header %>
+
+<div class="container">
+    <header class="jumbotron">
+        <div class="container">
+            <h2>Welcome to LikeMindsCamp!!!</h2>
+            <p>View our world-beaters codecamps all over the world!</p>
+            <div class="btn btn-warning btn-lg">
+                <a href="/campground/new">Add New campgrounds</a>
+            </div>
+
+        </div>
+
+    </header>
+
+    <div class="row text-center">
+        <% data.forEach(campground => { %>
+        <div class="col-md-3 col-sm-6">
+            <div class="thumbnail">
+                <img src="<%= campground.image %>">
+                <div class="caption">
+                    <h4>
+                        <%= campground.name %>
+                    </h4>
+                </div>
+                <p>
+                    <a class="btn btn-primary" href="/campgrounds/<%= campground._id %>">More Info</a>
+                </p>
+
+
+            </div>
+
+        </div>
+
+
+
+
+
+
+        <% }) %>
+    </div>
+    <% include ../partials/footer %>
+</div>
