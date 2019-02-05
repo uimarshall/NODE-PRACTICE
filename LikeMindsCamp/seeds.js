@@ -41,7 +41,6 @@ function seedDB() {
 				} else {
 					console.log("New Camp has been created");
 				}
-
 				// Create Comment
 				Comment.create(
 					{

@@ -1,127 +1,71 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const passport = require("passport");
+const localStrategy = require("passport-local");
+const passportLocalMongoose = require("passport-local-mongoose");
+const expressSession = require("express-session");
 const Campground = require("./models/campground");
 const Comment = require("./models/comments");
+const User = require("./models/users");
 const seedDB = require("./seeds");
-
 mongoose.connect("mongodb://localhost/LikeMindsCamp");
+
+// ROUTES
+const commentsRoute = require("./routes/comments");
+const campgroundsRoute = require("./routes/campgrounds");
+const indexRoute = require("./routes/index");
 
 const app = express();
 // Call the seedDB fn, everytime the server starts, the DB shud be seeded
-seedDB();
+// seedDB();
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(
+	bodyParser.urlencoded({
+		extended: true
+	})
+);
+// __dirname is the currently directory where the script/app is running
+app.use(express.static(__dirname + "/public"));
+console.log(__dirname);
 app.set("view engine", "ejs");
-app.get("/", (req, res) => {
-	res.render("landing", { title: "" });
+
+// ==========================================
+// CONFIGURE PASSPORT
+// Tell express to use session
+app.use(
+	expressSession({
+		// The secret will beused to encode & decode the sessions
+		// so the data inside the sessions wil not be readable but encoded
+		secret: "I am the best developer in the world",
+		resave: false,
+		saveUninitialized: false
+	})
+);
+// These 2 MIDDLEWARE must be used to tell express to use passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Use localStrategy
+passport.use(new localStrategy(User.authenticate()));
+// The serializeUser encodes the data & pass it back to the session
+passport.serializeUser(User.serializeUser());
+// The deserializeUser takes the encoded data and unencodes it
+passport.deserializeUser(User.deserializeUser());
+
+// Middleware to show login & signup if user isNotLoggedIn
+// 'req.user' will be empty/undefined if no user is signed in
+// or will output the 'username' & 'id' if user is signed in
+// This middleware will be called on every route
+app.use((req, res, next) => {
+	res.locals.currentUser = req.user;
+	next();
 });
 
-// INDEX - Show all Campgrounds
-// GET ALL CAMPGROUNDS FROM DB
-app.get("/campgrounds", (req, res) => {
-	Campground.find({}, (err, allcampgrounds) => {
-		if (err) {
-			console.log(err);
-		} else {
-			res.render("campgrounds/index", {
-				data: allcampgrounds,
-				title: "campground"
-			});
-		}
-	});
-});
-
-// ENABLING USERS TO CREATE NEW CAMPGROUDS
-// Set up new campground POST route
-// Setup route to show form for users to add campground
-
-// CREATE- add new Campground to the Db
-// create new campgrounds
-app.post("/campgrounds", (req, res) => {
-	// get data from form and add to the campgrounds array
-	let campName = req.body.campname;
-	let imageUrl = req.body.imageUrl;
-	let desc = req.body.description;
-	// the 'name' & 'image' key comes frm the campgrounds array
-	let newCampground = { name: campName, image: imageUrl, description: desc };
-	Campground.create(newCampground, (err, newlyCreatedCamp) => {
-		if (err) {
-			console.log(err);
-		} else {
-			// redirect back to the campground(home) page
-			res.redirect("/campgrounds");
-		}
-	});
-	// campgrounds.push(newCampground);
-});
-
-// NEW- Show form to create new campgrounds
-app.get("/campgrounds/new", (req, res) => {
-	res.render("campgrounds/newCampground", { title: "newcamp" });
-});
-
-// SHOW - shows more info about one campground
-// This route must come after 'NEW' otherwise 'new' in "/campground/new" will be treated as an ID
-app.get("/campgrounds/:id", (req, res) => {
-	// find the campground with provided ID
-	Campground.findById(req.params.id)
-		.populate("comments")
-		.exec((err, foundCampground) => {
-			if (err) {
-				console.log(err);
-			} else {
-				//render show template with that campground found
-				console.log(foundCampground);
-				res.render("campgrounds/show", {
-					campground: foundCampground,
-					title: "desc"
-				});
-			}
-		});
-});
-
-// =============================================
-// COMMENTS ROUTE
-// =============================================
-
-// The added 'comments' will be associated with a particular campground
-// Hence the url = "/campgrounds/:id/comments/new"
-// And the comments will be submitted to that particular campground = "/campgrounds/:id/comments" thru POST
-app.get("/campgrounds/:id/comments/new", (req, res) => {
-	Campground.findById(req.params.id, (err, campgroundFound) => {
-		if (err) {
-			console.log(err);
-		} else {
-			res.render("comments/new", {
-				campground: campgroundFound,
-				title: "comments"
-			});
-		}
-	});
-});
-
-app.post("/campgrounds/:id/comments", (req, res) => {
-	// Lookup campground using ID
-	Campground.findById(req.params.id, (err, campgroundFound) => {
-		if (err) {
-			console.log(err);
-		} else {
-			// Create new comment
-			Comment.create(req.body.comment, (err, commentCreated) => {
-				if (err) {
-					console.log(err);
-				} else {
-					// Link the commentCreated to the campgroundFound
-					campgroundFound.comments.push(commentCreated);
-					campgroundFound.save();
-					// Redirect to show page
-					res.redirect("/campgrounds/" + campgroundFound._id);
-				}
-			});
-		}
-	});
-});
+// MIDDLEWARE FOR ROUTES
+app.use(commentsRoute);
+app.use(campgroundsRoute);
+app.use(indexRoute);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
