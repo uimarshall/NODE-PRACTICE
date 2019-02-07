@@ -5,6 +5,7 @@ const passport = require("passport");
 const localStrategy = require("passport-local");
 const passportLocalMongoose = require("passport-local-mongoose");
 const expressSession = require("express-session");
+const methodOverride = require("method-override");
 const Campground = require("./models/campground");
 const Comment = require("./models/comments");
 const User = require("./models/users");
@@ -25,10 +26,11 @@ app.use(
 		extended: true
 	})
 );
+app.set("view engine", "ejs");
 // __dirname is the currently directory where the script/app is running
 app.use(express.static(__dirname + "/public"));
 console.log(__dirname);
-app.set("view engine", "ejs");
+app.use(methodOverride("_method"));
 
 // ==========================================
 // CONFIGURE PASSPORT

@@ -8,10 +8,7 @@ const CommentSchema = new Schema({
 	author: {
 		// This line means which user authored or make this comment?
 		// Is like having a user_id in the 'Comments' table or model
-		id: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "User"
-		},
+		id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 		username: String
 	}
 });

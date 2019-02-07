@@ -1,5 +1,6 @@
 const express = require("express");
-const router = express.Router();
+// mergeParams: true is to enable us find the 'id' in the db when we add comments
+const router = express.Router({ mergeParams: true });
 const Campground = require("../models/campground");
 const Comment = require("../models/comments");
 const User = require("../models/users");
@@ -22,7 +23,7 @@ router.get("/campgrounds/:id/comments/new", isLoggedIn, (req, res) => {
 		}
 	});
 });
-
+// Create Comments
 router.post("/campgrounds/:id/comments", isLoggedIn, (req, res) => {
 	// Lookup campground using ID
 	Campground.findById(req.params.id, (err, campgroundFound) => {
@@ -36,16 +37,17 @@ router.post("/campgrounds/:id/comments", isLoggedIn, (req, res) => {
 				} else {
 					// B4 we push the 'comments' to the campground,we want to:
 					// 1. add username & id to the comment
+					// The only way we get the current user is if the user is loggedIn so we use 'req.user'
 					// console.log("New comment's username will be: " + req.user.username);
-					Comment.author.id = req.user._id;
-					Comment.author.username = req.user.username;
-					// 2. save the comment
-					Comment.save();
+					commentCreated.author.id = req.user._id;
+					commentCreated.author.username = req.user.username;
+					// // 2. save the comment
+					commentCreated.save();
 					// Link the commentCreated to the campgroundFound
 					campgroundFound.comments.push(commentCreated);
 					campgroundFound.save();
 					// Redirect to show page
-					console.log(Comment);
+					console.log(commentCreated);
 					res.redirect("/campgrounds/" + campgroundFound._id);
 				}
 			});
