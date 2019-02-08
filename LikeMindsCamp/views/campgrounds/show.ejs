@@ -21,10 +21,13 @@
                     </p>
                     <p><em>Submitted By -
                             <%= campground.author.username %></em></p>
+                    <!-- If a user is not loggedIn it should not be able to EDIT & DELETE so we hide the buttons        -->
+                    <% if(currentUser && campground.author.id.equals(currentUser._id)) { %>
                     <a class="btn btn-warning" href="/campgrounds/<%= campground._id %>/edit">Edit</a>
                     <form id="delete-form" action="/campgrounds/<%= campground._id %>?_method=DELETE" method="post">
                         <button class="btn btn-danger">Delete</button>
                     </form>
+                    <% } %>
                 </div>
             </div>
             <div class="well">
@@ -40,7 +43,16 @@
                                 <%= comment.author.username %></strong>
                         </h5>
                         <span class="pull-right">10 days ago</span>
-                        <%= comment.text %>
+                        <p>
+                            <%= comment.text %>
+                        </p>
+                        <% if(currentUser && comment.author.id.equals(currentUser._id)) { %>
+                        <a href="/campgrounds/<%= campground._id %>/comments/<%= comment._id %>/edit" class="btn btn-sm btn-warning">Edit</a>
+                        <form id="delete-form" action="/campgrounds/<%= campground._id %>/comments/<%= comment._id %>?_method=DELETE"
+                            method="post">
+                            <input type="submit" class="btn btn-sm btn-danger" value="Delete">
+                        </form>
+                        <% } %>
                     </div>
                 </div>
                 <%}) %>

@@ -5,6 +5,7 @@ const passport = require("passport");
 const localStrategy = require("passport-local");
 const passportLocalMongoose = require("passport-local-mongoose");
 const expressSession = require("express-session");
+const flash = require("connect-flash");
 const methodOverride = require("method-override");
 const Campground = require("./models/campground");
 const Comment = require("./models/comments");
@@ -31,6 +32,7 @@ app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
 console.log(__dirname);
 app.use(methodOverride("_method"));
+app.use(flash());
 
 // ==========================================
 // CONFIGURE PASSPORT
@@ -58,9 +60,15 @@ passport.deserializeUser(User.deserializeUser());
 // Middleware to show login & signup if user isNotLoggedIn
 // 'req.user' will be empty/undefined if no user is signed in
 // or will output the 'username' & 'id' if user is signed in
-// This middleware will be called on every route
+// This middleware will be called on or added to every route and templates(views)
+// Every route & template will have the currentUser = currently loggedIn User
+/*The 'req.user' is only available if a user is loggedIn if not it will throw an error such as:
+"Cannot read property '_id' of undefined" */
 app.use((req, res, next) => {
 	res.locals.currentUser = req.user;
+	// pass flash message to every templates
+	res.locals.error = req.flash("error");
+	res.locals.success = req.flash("success");
 	next();
 });
 

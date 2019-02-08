@@ -29,6 +29,7 @@ router.post("/register", (req, res) => {
 	User.register(newUser, req.body.password, (err, user) => {
 		if (err) {
 			console.log(err);
+			req.flash("error", err.message);
 			// short-cct back to register page if error
 			return res.render("register", { title: "register" });
 		}
@@ -36,6 +37,7 @@ router.post("/register", (req, res) => {
 		// We use the 'local' Strategy, we can also use 'twitter', 'fb' later
 		// we use IIFE to immediately invoke the calback once the user is authenticated and redirect to '/campgrounds'
 		passport.authenticate("local")(req, res, () => {
+			req.flash("success", "Welcome to LikeMinds " + user.username + "!");
 			res.redirect("/campgrounds");
 		});
 	});
@@ -62,6 +64,7 @@ router.post(
 router.get("/logout", (req, res) => {
 	// passport will destroy all the user data from the session using 'req.logout' frm the pkg
 	req.logout();
+	req.flash("success", "Logged you out!");
 	res.redirect("/campgrounds");
 });
 
